@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${subject}">Celebration</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #ff6b6b;
+        }
+        .header h1 {
+            color: #ff6b6b;
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .content {
+            margin: 20px 0;
+        }
+        .message {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 16px;
+            line-height: 1.7;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .celebration-icon {
+            font-size: 48px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #ff6b6b;
+            text-decoration: none;
+        }
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .celebrate-btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .confetti {
+            color: #ff6b6b;
+            font-size: 20px;
+            margin: 0 5px;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 20px;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="celebration-icon">🎉</div>
+        <h1 th:text="${subject}">Celebration Time!</h1>
+    </div>
+
+    <div class="content">
+        <div class="greeting">
+            <p>Hello <strong th:text="${name}">Friend</strong>,</p>
+        </div>
+
+        <div class="message">
+            <span class="confetti">🎊</span>
+            <span th:utext="${message}">Celebration message goes here</span>
+            <span class="confetti">🎊</span>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <span style="font-size: 24px; margin: 0 10px;">🎂</span>
+            <span style="font-size: 24px; margin: 0 10px;">🎈</span>
+            <span style="font-size: 24px; margin: 0 10px;">🌟</span>
+            <span style="font-size: 24px; margin: 0 10px;">🎁</span>
+            <span style="font-size: 24px; margin: 0 10px;">🥳</span>
+        </div>
+
+        <p style="text-align: center; font-style: italic; color: #666; margin-top: 20px;">
+            "Every moment is a fresh beginning, and every celebration brings us closer together!"
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>This celebration message was sent by VDT Communications System</p>
+        <p>&copy; <span th:text="${currentYear}">2025</span> VDT. All rights reserved.</p>
+        <p style="font-size: 12px; margin-top: 10px;">
+            This is an automated celebration message. Please do not reply to this email.
+        </p>
+    </div>
+</div>
+</body>
+</html>
