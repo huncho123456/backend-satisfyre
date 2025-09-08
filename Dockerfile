@@ -1,42 +1,40 @@
-# -----------------------------
-# 1️⃣ Build Stage
-# -----------------------------
+# Use the JDK for the build stage
 FROM eclipse-temurin:17-jdk as builder
 
 WORKDIR /app
 
-# Copy Gradle wrapper and config files first (for caching)
+# 1. Copy Gradle wrapper and config files first (for cache)
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
-
 # Copy the source code
 COPY src src
 
-# Make Gradle wrapper executable and build the app
+# Make gradlew executable and build the application
 RUN chmod +x gradlew
 RUN ./gradlew clean build -x test
 
-# -----------------------------
-# 2️⃣ Runtime Stage
-# -----------------------------
+# 2. Final runtime stage - use JRE for smaller image
 FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 
-# Create a non-root user for security
+# Create a non-root user for security (important for Render)
 RUN groupadd --system javauser && useradd --system --gid javauser javauser
 
-# Copy the built JAR from the builder stage
+# --- CREATE EMPTY .env FILE FIRST ---
+RUN touch .env
 COPY --from=builder /app/build/libs/*.jar app.jar
+COPY .env .env
 
-# Set ownership to non-root user
+# Change ownership to non-root user (includes the .env file)
 RUN chown -R javauser:javauser /app
 USER javauser
 
-# Expose a default port (for documentation; Render overrides it)
+# Expose the port (Render will use this)
 EXPOSE 8080
 
-# Use Render's dynamic port
-ENTRYPOINT ["sh", "-c", "java -Dserver.port=$PORT -jar /app/app.jar"]
+# Use ENTRYPOINT + CMD for better flexibility
+ENTRYPOINT ["java", "-jar"]
+CMD ["/app/app.jar"]
