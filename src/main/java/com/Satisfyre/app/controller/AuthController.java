@@ -4,8 +4,10 @@ package com.Satisfyre.app.controller;
 import com.Satisfyre.app.config.dotenvConfig;
 import com.Satisfyre.app.dto.LoginRequest;
 import com.Satisfyre.app.dto.RegistrationRequest;
+import com.Satisfyre.app.dto.ResetPasswordRequest;
 import com.Satisfyre.app.dto.Response;
 import com.Satisfyre.app.entity.UserEntity;
+import com.Satisfyre.app.exceptions.InvalidCredentialException;
 import com.Satisfyre.app.repo.UserRepository;
 import com.Satisfyre.app.service.UserService;
 import jakarta.validation.Valid;
@@ -72,6 +74,28 @@ public class AuthController {
         headers.setLocation(URI.create(redirectUrl));
         return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
+
+    @PostMapping("/request-reset")
+    public ResponseEntity<Response> requestReset(@RequestParam String email) {
+        return ResponseEntity.ok(userService.requestPasswordReset(email));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Response> resetPassword(
+            @RequestParam String token,
+            @RequestBody ResetPasswordRequest request) {
+
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new InvalidCredentialException("Passwords do not match");
+        }
+
+        return ResponseEntity.ok(
+                userService.resetPassword(token, request.getPassword())
+        );
+    }
+
+
+
 
 
 

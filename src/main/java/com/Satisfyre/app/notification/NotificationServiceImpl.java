@@ -99,6 +99,36 @@ public class NotificationServiceImpl implements NotificationService {
                 .replace("'", "&#x27;");
     }
 
+    @Async
+    @Override
+    public void sendPasswordResetEmail(String to, String firstName, String resetLink) {
+        try {
+            String subject = "Password Reset Request";
+
+            String body = "Hello " + firstName + ",\n\n"
+                    + "We received a request to reset your password.\n"
+                    + "Click the link below to reset your password:\n"
+                    + resetLink + "\n\n"
+                    + "If you did not request this, please ignore.\n\n"
+                    + "Best,\nSatisfyre Team";
+
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(to);
+            helper.setFrom("micheal.okafor.79677@gmail.com");
+            helper.setSubject(subject);
+            helper.setText(body, false); // false = plain text
+
+            javaMailSender.send(message);
+            log.info("✅ Password reset email sent to: {}", to);
+
+        } catch (Exception e) {
+            log.error("❌ Failed to send password reset email to {}: {}", to, e.getMessage(), e);
+        }
+    }
+
+
 
 
     @Override

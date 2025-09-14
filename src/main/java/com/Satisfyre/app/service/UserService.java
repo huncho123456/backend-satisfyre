@@ -24,6 +24,9 @@ public interface UserService {
     List<DownlineDTO> getAllDownlinesWithLevels(String referralCode);
     List<UserEntity> getDownlinesByLevel(String referralCode, int targetLevel);
     Map<Integer, List<UserEntity>> getDownlinesGroupedByLevel(String referralCode);
+    Response requestPasswordReset(String email);
+    Response resetPassword(String token, String newPassword);
+
 
 
 

@@ -2,9 +2,11 @@ package com.Satisfyre.app.service.impl;
 
 import com.Satisfyre.app.config.dotenvConfig;
 import com.Satisfyre.app.dto.*;
+import com.Satisfyre.app.entity.PasswordResetToken;
 import com.Satisfyre.app.exceptions.InvalidCredentialException;
 import com.Satisfyre.app.exceptions.NotFoundException;
 import com.Satisfyre.app.notification.NotificationService;
+import com.Satisfyre.app.repo.PasswordResetTokenRepository;
 import com.Satisfyre.app.service.UserService;
 import com.Satisfyre.app.entity.UserEntity;
 import com.Satisfyre.app.enums.UserRole;
@@ -35,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private final JwtUtils jwtUtils;
     private final ModelMapper modelMapper;
     private final NotificationService notificationService;
+    private final PasswordResetTokenRepository tokenRepository;
 
     @Override
     public Response registerUser(RegistrationRequest registrationRequest) {
@@ -224,6 +227,62 @@ public class UserServiceImpl implements UserService {
     private String generateReferralCode(String name) {
         return name.substring(0, 3).toUpperCase() + UUID.randomUUID().toString().substring(0, 5).toUpperCase();
     }
+
+
+
+    @Override
+    public Response requestPasswordReset(String email) {
+
+        log.info("User RequestPasswordReset() " + email);
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        PasswordResetToken token = PasswordResetToken.builder()
+                .token(UUID.randomUUID().toString())
+                .user(user)
+                .expiryDate(LocalDateTime.now().plusMinutes(30))
+                .used(false)
+                .build();
+
+        tokenRepository.save(token);
+
+        String resetLink = BASEURL + "/auth/reset-password?token=" + token.getToken();
+
+        notificationService.sendPasswordResetEmail(
+                user.getEmail(),
+                user.getFirstName(),
+                resetLink
+        );
+
+        return Response.builder()
+                .status(200)
+                .message("Password reset link sent to email")
+                .build();
+    }
+
+    @Override
+    public Response resetPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new NotFoundException("Invalid token"));
+
+        if (resetToken.isUsed() || resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new InvalidCredentialException("Token expired or already used");
+        }
+
+        UserEntity user = resetToken.getUser();
+        log.info("User PasswordReset" + user.getEmail());
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        resetToken.setUsed(true);
+        tokenRepository.save(resetToken);
+
+        return Response.builder()
+                .status(200)
+                .message("Password reset successful")
+                .build();
+    }
+
 
     @Override
     public List<UserEntity> getDirectDownlines(String referralCode) {
