@@ -262,8 +262,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Response resetPassword(String token, String newPassword) {
-        PasswordResetToken resetToken = tokenRepository.findByToken(token)
+        PasswordResetToken resetToken = tokenRepository.findByToken(token.trim())
                 .orElseThrow(() -> new NotFoundException("Invalid token"));
+        log.info(" Found in DB: {}", resetToken.getToken());
 
         if (resetToken.isUsed() || resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new InvalidCredentialException("Token expired or already used");
