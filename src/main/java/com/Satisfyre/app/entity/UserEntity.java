@@ -80,6 +80,10 @@ public class UserEntity {
     @Column(updatable = false)
     private LocalDate createdAt;
 
+    @Column(name = "profile_pic_url", length = 500)
+    private String profilePicUrl;
+
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDate.now();

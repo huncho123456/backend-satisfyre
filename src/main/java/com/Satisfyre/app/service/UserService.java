@@ -3,6 +3,7 @@ package com.Satisfyre.app.service;
 
 import com.Satisfyre.app.dto.*;
 import com.Satisfyre.app.entity.UserEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -18,14 +19,15 @@ public interface UserService {
     Response deleteOwnAccount();
     List<UserEntity> getDirectDownlines(String referralCode);
     List<UserEntity> getAllDownlines(String referralCode);
-    Response getMyBookingHistory();
     Response getUserById (Long id);
-    public String getUplineNameByReferralCode(String referralCode);
+    String getUplineNameByReferralCode(String referralCode);
     List<DownlineDTO> getAllDownlinesWithLevels(String referralCode);
     List<UserEntity> getDownlinesByLevel(String referralCode, int targetLevel);
     Map<Integer, List<UserEntity>> getDownlinesGroupedByLevel(String referralCode);
     Response requestPasswordReset(String email);
     Response resetPassword(String token, String newPassword);
+    String updateProfilePicture(Long userId, MultipartFile file);
+    void deleteProfilePicture(Long userId);
 
 
 

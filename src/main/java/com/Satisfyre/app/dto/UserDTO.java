@@ -44,6 +44,8 @@ public class UserDTO {
 
     private String message;
 
+    private String profilePicUrl;
+
     private UserDTO user;
     private List<UserDTO> users;       // list of downlines
 
@@ -67,6 +69,7 @@ public class UserDTO {
                 .accountNumber(user.getAccountNumber())
                 .accountName(user.getAccountName())
                 .employmentStatus(user.getEmploymentStatus())
+                .profilePicUrl(user.getProfilePicUrl())
                 .build();
     }
 }

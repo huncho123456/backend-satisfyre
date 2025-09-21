@@ -2,10 +2,7 @@ package com.Satisfyre.app.controller;
 
 
 import com.Satisfyre.app.config.dotenvConfig;
-import com.Satisfyre.app.dto.LoginRequest;
-import com.Satisfyre.app.dto.RegistrationRequest;
-import com.Satisfyre.app.dto.ResetPasswordRequest;
-import com.Satisfyre.app.dto.Response;
+import com.Satisfyre.app.dto.*;
 import com.Satisfyre.app.entity.UserEntity;
 import com.Satisfyre.app.exceptions.InvalidCredentialException;
 import com.Satisfyre.app.repo.UserRepository;
@@ -76,9 +73,10 @@ public class AuthController {
     }
 
     @PostMapping("/request-reset")
-    public ResponseEntity<Response> requestReset(@RequestParam String email) {
-        return ResponseEntity.ok(userService.requestPasswordReset(email));
+    public ResponseEntity<Response> requestReset(@RequestBody PasswordResetRequest request) {
+        return ResponseEntity.ok(userService.requestPasswordReset(request.getEmail()));
     }
+
 
     @PostMapping("/reset-password")
     public ResponseEntity<Response> resetPassword(

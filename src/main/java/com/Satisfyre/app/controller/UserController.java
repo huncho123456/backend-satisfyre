@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -86,6 +87,29 @@ public class UserController {
     @GetMapping("/downlines/grouped/{referralCode}")
     public ResponseEntity<Map<Integer, List<UserEntity>>> getDownlinesGrouped(@PathVariable String referralCode) {
         return ResponseEntity.ok(userService.getDownlinesGroupedByLevel(referralCode));
+    }
+
+    // 👉 Update profile picture
+    @PutMapping("/{userId}/profile-picture")
+    public ResponseEntity<String> uploadProfilePicture(
+            @PathVariable Long userId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            String imageUrl = userService.updateProfilePicture(userId, file);
+            return ResponseEntity.ok(imageUrl);
+        } catch (Exception e) {
+            e.printStackTrace(); // log full error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("❌ Failed to upload: " + e.getMessage());
+        }
+    }
+
+
+    // 👉 Delete profile picture
+    @DeleteMapping("/{userId}/profile-picture")
+    public ResponseEntity<String> deleteProfilePicture(@PathVariable Long userId) {
+        userService.deleteProfilePicture(userId);
+        return ResponseEntity.ok("Profile picture deleted successfully");
     }
 
 

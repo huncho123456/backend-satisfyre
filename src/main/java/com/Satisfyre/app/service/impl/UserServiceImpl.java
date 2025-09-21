@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -38,6 +39,9 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper modelMapper;
     private final NotificationService notificationService;
     private final PasswordResetTokenRepository tokenRepository;
+    private final CloudinaryService cloudinaryService;
+    String FRONT_ENDPOINT = dotenvConfig.get("FRONTEND_BASEURL");
+
 
     @Override
     public Response registerUser(RegistrationRequest registrationRequest) {
@@ -195,6 +199,10 @@ public class UserServiceImpl implements UserService {
         if (userDTO.getFirstName() != null) existingUser.setFirstName(userDTO.getFirstName());
         if (userDTO.getLastName() != null) existingUser.setLastName(userDTO.getLastName());
         if (userDTO.getPhoneNumber() != null) existingUser.setPhoneNumber(userDTO.getPhoneNumber());
+        if (userDTO.getAccountName() != null) existingUser.setAccountName(userDTO.getAccountName());
+        if (userDTO.getAccountNumber() != null) existingUser.setAccountNumber(userDTO.getAccountNumber());
+        if (userDTO.getPhoneNumber() != null) existingUser.setPhoneNumber(userDTO.getPhoneNumber());
+
 
         if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
             existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
@@ -228,6 +236,53 @@ public class UserServiceImpl implements UserService {
         return name.substring(0, 3).toUpperCase() + UUID.randomUUID().toString().substring(0, 5).toUpperCase();
     }
 
+    @Override
+    public String updateProfilePicture(Long userId, MultipartFile file) {
+
+        log.info("Update user pic");
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Optional: delete old image before uploading new one
+        if (user.getProfilePicUrl() != null) {
+            String publicId = extractPublicId(user.getProfilePicUrl());
+            cloudinaryService.deleteFile(publicId);
+        }
+
+        // Upload new image
+        String imageUrl = cloudinaryService.uploadFile(file);
+        System.out.println(imageUrl);
+        user.setProfilePicUrl(imageUrl);
+        userRepository.save(user);
+
+        return imageUrl;
+    }
+
+    private String extractPublicId(String imageUrl) {
+        // ⚡ Cloudinary URLs look like: https://res.cloudinary.com/demo/image/upload/v1234567890/profile_pics/abcd1234.jpg
+        // You need to extract "profile_pics/abcd1234"
+        String[] parts = imageUrl.split("/");
+        String fileName = parts[parts.length - 1];
+        return "profile_pics/" + fileName.split("\\.")[0];
+    }
+
+    @Override
+    public void deleteProfilePicture(Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getProfilePicUrl() != null) {
+            String publicId = extractPublicId(user.getProfilePicUrl());
+            cloudinaryService.deleteFile(publicId);
+
+            // remove link from DB
+            user.setProfilePicUrl(null);
+            userRepository.save(user);
+
+        }
+    }
+
+
 
 
     @Override
@@ -246,11 +301,12 @@ public class UserServiceImpl implements UserService {
 
         tokenRepository.save(token);
 
-        String resetLink = BASEURL + "/auth/reset-password?token=" + token.getToken();
+        String resetLink = FRONT_ENDPOINT + "/html/auth-reset-password-basic.html?token=" + token.getToken();
 
         notificationService.sendPasswordResetEmail(
                 user.getEmail(),
                 user.getFirstName(),
+                user.getLastName(),
                 resetLink
         );
 
@@ -264,7 +320,7 @@ public class UserServiceImpl implements UserService {
     public Response resetPassword(String token, String newPassword) {
         PasswordResetToken resetToken = tokenRepository.findByToken(token.trim())
                 .orElseThrow(() -> new NotFoundException("Invalid token"));
-        log.info(" Found in DB: {}", resetToken.getToken());
+                log.info(" Found in DB: {}", resetToken.getToken());
 
         if (resetToken.isUsed() || resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new InvalidCredentialException("Token expired or already used");
@@ -330,7 +386,7 @@ public class UserServiceImpl implements UserService {
         return all;
     }
 
-    // ✅ Get only a specific level's downlines
+    //  Get only a specific level's downlines
     @Override
     public List<UserEntity> getDownlinesByLevel(String referralCode, int targetLevel) {
         return getAllDownlinesWithLevels(referralCode).stream()
@@ -339,7 +395,7 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
-    // ✅ Group downlines by level
+    // Group downlines by level
     @Override
     public Map<Integer, List<UserEntity>> getDownlinesGroupedByLevel(String referralCode) {
         return getAllDownlinesWithLevels(referralCode).stream()
@@ -348,14 +404,6 @@ public class UserServiceImpl implements UserService {
                         Collectors.mapping(DownlineDTO::getUser, Collectors.toList())
                 ));
     }
-
-
-
-    @Override
-    public Response getMyBookingHistory() {
-        return null;
-    }
-
 
     @Override
     public Response getUserById(Long id) {

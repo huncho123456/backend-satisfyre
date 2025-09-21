@@ -18,7 +18,9 @@ import java.util.function.Function;
 @Slf4j
 public class JwtUtils {
 
-    private static final long EXPIRATION_TIME_IN_MILSEC = 1000L * 60L * 5L;  // 5 minutes
+//    private static final long EXPIRATION_TIME_IN_MILSEC = 1000L * 60L * 5L;  // 5 minutes
+    private static final long EXPIRATION_TIME_IN_MILSEC = 1000L * 60L * 60L * 24L; // 24 hours
+
 
     private SecretKey key;
 
