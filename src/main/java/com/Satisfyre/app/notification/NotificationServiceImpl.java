@@ -32,6 +32,11 @@ public class NotificationServiceImpl implements NotificationService {
     String FRONT_ENDPOINT = dotenvConfig.get("FRONTEND_BASEURL");
     String BaseUrl = dotenvConfig.get("BASEURL");
 
+    public static String capitalizeFirst(String str) {
+        if (str == null || str.isEmpty()) return str;
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
     @Async
     @Override
     public void sendWelcomeEmail(String to, String fullName, String email, String password, String phoneNumber, String consultantId) {
@@ -58,7 +63,7 @@ public class NotificationServiceImpl implements NotificationService {
             String referralLink = BaseUrl + "/api/auth/register?ref=" + consultantId;
             // 2️⃣ Replace placeholders in HTML template
             String processedHtml = rawHtml
-                    .replace("{{fullName}}", escapeHtml(fullName))
+                    .replace("{{fullName}}", escapeHtml(capitalizeFirst(fullName)))
                     .replace("{{email}}", escapeHtml(email))
                     .replace("{{password}}", escapeHtml(password))
                     .replace("{{phoneNumber}}", escapeHtml(phoneNumber))
@@ -125,8 +130,8 @@ public class NotificationServiceImpl implements NotificationService {
 
             // 2️⃣ Replace placeholders
             String processedHtml = rawHtml
-                    .replace("{{firstName}}", escapeHtml(firstName))
-                    .replace("{{lastName}}", escapeHtml(lastName))
+                    .replace("{{firstName}}", escapeHtml(capitalizeFirst(firstName)))
+                    .replace("{{lastName}}", escapeHtml(capitalizeFirst(lastName)))
                     .replace("{{resetLink}}", escapeHtml(resetLink));
 
             // 3️⃣ Send email
@@ -135,7 +140,7 @@ public class NotificationServiceImpl implements NotificationService {
 
             helper.setTo(to);
             helper.setFrom("micheal.okafor.79677@gmail.com");
-            helper.setSubject("Password Reset Request");
+            helper.setSubject("Satisfyre Password Reset Request");
             helper.setText(processedHtml, true);
 
             javaMailSender.send(message);
