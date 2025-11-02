@@ -39,6 +39,7 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	implementation 'org.springframework.boot:spring-boot-starter-web-services'
 	implementation 'com.mysql:mysql-connector-j:8.0.33'
+	implementation 'net.bytebuddy:byte-buddy:1.14.13'
 	implementation 'me.paulschwarz:spring-dotenv:3.0.0'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 	implementation 'org.modelmapper:modelmapper:3.1.1'

@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @Builder
 public class UserEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @NotBlank(message = "Email is required")
@@ -66,7 +66,7 @@ public class UserEntity {
     @Column(name = "bank_name")
     private String bankName;
 
-    @NotBlank(message = "Account name is required")
+    @NotBlank(message = "Account number is required")
     @Column(name = "account_number")
     private String accountNumber;
 
