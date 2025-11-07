@@ -6,6 +6,7 @@ import com.Satisfyre.app.dto.Response;
 import com.Satisfyre.app.dto.UserDTO;
 import com.Satisfyre.app.entity.UserEntity;
 import com.Satisfyre.app.repo.UserRepository;
+import com.Satisfyre.app.security.JwtUtils;
 import com.Satisfyre.app.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -26,6 +27,7 @@ public class UserController {
     private final UserService userService;
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
+
 
     @GetMapping("/all")
 //    @PreAuthorize("hasAuthority('ADMIN')") // ADMIN ALONE HAVE ACCESS TO THIS API
@@ -111,6 +113,8 @@ public class UserController {
         userService.deleteProfilePicture(userId);
         return ResponseEntity.ok("Profile picture deleted successfully");
     }
+
+
 
 
 

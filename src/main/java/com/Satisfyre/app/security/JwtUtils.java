@@ -18,10 +18,31 @@ import java.util.function.Function;
 @Slf4j
 public class JwtUtils {
 
-//    private static final long EXPIRATION_TIME_IN_MILSEC = 1000L * 60L * 5L;  // 5 minutes
-      private static final long EXPIRATION_TIME_IN_MILSEC = 1000L * 60L * 60L * 24L; // 15 minutes
+      private static final long EXTEND_TIME_IN_MILSEC = 1000L * 60L * 5L;  // 5 minutes
+      private static final long EXPIRATION_TIME_IN_MILSEC = 1000L * 60L * 60L * 24L * 30L; // 30 days
 
 
+
+
+    // Extend token expiration by extra time
+    public String extendTokenExpiration(String existingToken) {
+        var claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(existingToken)
+                .getBody();
+
+        // Calculate new expiration
+        Date currentExpiration = claims.getExpiration();
+        long newExpirationMillis = currentExpiration.getTime() + EXTEND_TIME_IN_MILSEC;
+
+        return Jwts.builder()
+                .setSubject(claims.getSubject())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(newExpirationMillis))
+                .signWith(key)
+                .compact();
+    }
 
     private SecretKey key;
 

@@ -119,7 +119,7 @@ public class UserServiceImpl implements UserService {
 
         log.info("INSIDE loginUser() " + loginRequest.getEmail());
 
-        String JWTExpires = "15 Minutes";
+        String JWTExpires = "30 days";
 
         UserEntity user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new NotFoundException("Email Not Found"));
